@@ -39,6 +39,9 @@ function log_stop_backup {
 # HELP pg_dump_process The script works or not
 # TYPE pg_dump_process gauge
 pg_dump_process 0
+# HELP pg_dump_last_state The last status code of exit
+# TYPE pg_dump_last_state gauge
+pg_dump_last_state ${STATE_ERROR}
 EOF
     fi
 

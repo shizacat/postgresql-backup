@@ -1,0 +1,11 @@
+galaxy_info:
+  author: Alexey Matveev
+  description: Script backup postgresql data base
+  license: MIT
+  
+  min_ansible_version: 1.2
+  
+  platforms:
+  - name: EL
+    versions:
+    - 7

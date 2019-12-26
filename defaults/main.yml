@@ -1,0 +1,16 @@
+---
+# defaults file for postgresql-backup
+
+# Name of config file
+pg_backup_config_file: "config"
+
+# Content config file
+pg_backup_config: |
+  DIR_TO_BACKUP=/backup
+  DB_URL=postgresql://postgres:123456@localhost:5432/postgres
+  EXCLUDE="template1, template0"
+  ONLY_INCLUDE=""
+
+# User for config
+pg_backup_user: root
+pg_backup_group: root

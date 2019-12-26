@@ -1,0 +1,3 @@
+.vagrant
+tests/roles/postgresql-backup
+playbook.retry

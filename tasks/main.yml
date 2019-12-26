@@ -1,0 +1,28 @@
+---
+# tasks file for postgresql-backup
+
+- name: Create a directory bin
+  file:
+    path: /opt/pg_backup/bin
+    state: directory
+    mode: '0755'
+
+- name: Create a directory conf
+  file:
+    path: /opt/pg_backup/conf
+    state: directory
+    mode: '0755'
+
+- name: Copy script
+  copy:
+    src: "{{ role_path }}/files/pg_backup.sh"
+    dest: /opt/pg_backup/bin
+    mode: '0555'
+
+- name: Write the config file
+  copy:
+    content: "{{ pg_backup_config }}"
+    dest: /opt/pg_backup/conf/{{ pg_backup_config_file }}
+    mode: '0640'
+    owner: "{{ pg_backup_user }}"
+    group: "{{ pg_backup_group }}"

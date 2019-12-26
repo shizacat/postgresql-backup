@@ -1,0 +1,15 @@
+# Directory, where will be create the backup
+DIR_TO_BACKUP=/backup
+
+# URL for access to database
+# postgresql:///<dbname>  # access by unix socket
+DB_URL=postgresql://user:pass@host:5432/db_name
+
+# Exclude list database, split ","
+EXCLUDE="template1, template0"
+
+# If exists then will be use only this databases. Split ","
+ONLY_INCLUDE=""
+
+# Will not be create backup the roles
+IS_NOT_ROLES=""

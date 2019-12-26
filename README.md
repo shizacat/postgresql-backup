@@ -5,35 +5,32 @@ Role Name
 
 Тестирование
 
-```
+```bash
 cd tests
 ./setup.sh
 vagrant up
 ```
 
 Для применения измений в ansible
-```
+```bash
 vagrant provision
 ```
-
-Role Variables
---------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: servers
+      vars:
+        pg_backup_config_file: config.test
+        pg_backup_config: |
+          DIR_TO_BACKUP=/backup
+          DB_URL=postgresql:///postgres
+          EXCLUDE="template1"
+          ONLY_INCLUDE=""
+        pg_backup_user: postgres
+        pg_backup_group: postgres
       roles:
-         - { role: username.rolename, x: 42 }
+        - postgresql-backup
 
 License
 -------

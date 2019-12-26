@@ -17,6 +17,38 @@ function quote_string_by_element {
     echo ${result}
 }
 
+function get_url_prom {
+    echo "${PROM_PUSHGATEWAY_URL}/metrics/job/pg_dump/instance/`hostname`${PROM_PUSHGATEWAY_LABELS}"
+}
+
+function log_start_backup {
+    echo $(log_format "Start backup") >> ${LOG_PATH}
+
+    if ! [ -z "${PROM_PUSHGATEWAY_URL}" ]; then
+        cat <<EOF | curl --data-binary @- $(get_url_prom)
+# HELP pg_dump_process The script works or not
+# TYPE pg_dump_process gauge
+pg_dump_process 1
+EOF
+    fi
+}
+
+function log_stop_backup {
+    if ! [ -z "${PROM_PUSHGATEWAY_URL}" ]; then
+        cat <<EOF | curl --data-binary @- $(get_url_prom)
+# HELP pg_dump_process The script works or not
+# TYPE pg_dump_process gauge
+pg_dump_process 0
+EOF
+    fi
+
+    echo $(log_format "Stop backup. Status: ${STATE_ERROR}; Duration: ${TIME_DURATION} sec; Size: ${SIZE_BACKUP} bytes;") >> ${LOG_PATH}
+}
+
+function log_format {
+    echo "[`date --rfc-3339=seconds`] $1"
+}
+
 # Include config
 CONFIG_PATH=${CONFIG_PATH:-${1:-config}}
 
@@ -29,6 +61,14 @@ source ${CONFIG_PATH}
 
 # Setup
 TIME_START=$(date +%s)
+
+if ! [ -z "${LOG_DISABLE}" ]; then
+    LOG_PATH=/dev/null
+else
+    LOG_PATH=/var/log/pg_backup/${LOG_FILE:=pg_backup.log}
+fi
+
+log_start_backup
 
 if ! [ -d ${DIR_TO_BACKUP} ]; then
     echo "Directory for backup not exists"
@@ -54,30 +94,33 @@ else
         query="${query} WHERE datname NOT IN (${EXCLUDE_QUOTE})"
     fi
 fi
-db_list=$(psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${query}")
 
 #  Process
 ## The status code for all backup operation
 STATE_ERROR=0
-## The buffer for log
-STATE_LOG=""
+
+db_list=$(psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${query}" 2>>${LOG_PATH})
+STATE_ERROR=`expr $STATE_ERROR + $?`
 
 ## Clear backup dir
 rm -rf ${DIR_TO_BACKUP}/*
 
 for db_name in $db_list
 do
-    pg_dump -Fd -j 10 -f ${DIR_TO_BACKUP}/$db_name ${PG_CONFIG_STRING}
+    pg_dump -Fd -j 10 -f ${DIR_TO_BACKUP}/$db_name ${PG_CONFIG_STRING} 2>>${LOG_PATH}
     STATE_ERROR=`expr $STATE_ERROR + $?`
 done
 
 ## Roles
 if [ -z "${IS_NOT_ROLES}" ]; then
-    pg_dumpall -r ${PG_CONFIG_STRING} | gzip - > ${DIR_TO_BACKUP}/roles.sql.gz
+    pg_dumpall -r ${PG_CONFIG_STRING} 2>>${LOG_PATH} | gzip - > ${DIR_TO_BACKUP}/roles.sql.gz
     STATE_ERROR=`expr $STATE_ERROR + $?`
 fi
 
 # Logs
 TIME_DURATION=`expr $(date +%s) - ${TIME_START}`
+SIZE_BACKUP=`du -sb ${DIR_TO_BACKUP} | cut -f1`
+
+log_stop_backup
 
 exit ${STATE_ERROR}

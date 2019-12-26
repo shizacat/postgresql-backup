@@ -13,3 +13,16 @@ ONLY_INCLUDE=""
 
 # Will not be create backup the roles
 IS_NOT_ROLES=""
+
+# Logs settings
+# The log directory: /var/log/pg_backup
+# The file name, where the log will be stored. Default: pg_backup.log
+# LOG_FILE=
+# The log disable
+# LOG_DISABLE=""
+
+# Prometheus settings
+# Example: http://prom:9091
+PROM_PUSHGATEWAY_URL=""
+# Add custom the label, format: /label/value
+PROM_PUSHGATEWAY_LABELS=""

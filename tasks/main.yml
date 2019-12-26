@@ -26,3 +26,17 @@
     mode: '0640'
     owner: "{{ pg_backup_user }}"
     group: "{{ pg_backup_group }}"
+
+- name: Create a directory for logs
+  file:
+    path: /var/log/pg_backup/
+    state: directory
+    mode: '0755'
+    owner: "{{ pg_backup_user }}"
+    group: "{{ pg_backup_group }}"
+
+- name: Setup log rotate
+  template:
+    src: log-rotate.j2
+    dest: "/etc/logrotate.d/pg_backup_{{ pg_backup_config_file }}"
+  when: pg_backup_logrotate_disable is undefined

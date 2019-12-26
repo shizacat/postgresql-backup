@@ -14,3 +14,6 @@ pg_backup_config: |
 # User for config
 pg_backup_user: root
 pg_backup_group: root
+
+# Disable log rotate
+# pg_backup_logrotate_disable: false

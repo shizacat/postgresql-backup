@@ -1,16 +1,18 @@
 Role Name
 =========
 
-Установка скрипта бэкапа для базы данных PostgreSQL.
+The role is the script of backup database PostgreSQL.
 
-Возможности:
+Feature:
 
-- Бэкап ролей
-- Бэкап только указанных баз
-- Список исключений
+- Backup of postgresql role
+- Backup only selected databases
+- The list of exclude databases
+- Logs
+- The metrics for Prometheus
 
 
-Тестирование
+Testing
 
 ```bash
 cd tests
@@ -18,7 +20,7 @@ cd tests
 vagrant up
 ```
 
-Для применения измений в ansible
+During development, so that apply the changes.
 ```bash
 vagrant provision
 ```

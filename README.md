@@ -11,8 +11,25 @@ Feature:
 - Logs
 - The metrics for Prometheus
 
+### Run
 
-Testing
+For the script run, him need to specify file with settings.
+
+```bash
+./pg_backup.sh config.example
+```
+
+The description of config can be found in 
+[config](files/config).
+
+Paths:
+
+- /opt/pg_backup/bin - script
+- /opt/pg_backup/conf - folder with config
+- /var/log/pg_backup - folder with logs
+
+
+### Testing
 
 ```bash
 cd tests
@@ -21,6 +38,7 @@ vagrant up
 ```
 
 During development, so that apply the changes.
+
 ```bash
 vagrant provision
 ```

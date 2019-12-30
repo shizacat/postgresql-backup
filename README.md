@@ -13,14 +13,13 @@ Feature:
 
 ### Run
 
-For the script run, him need to specify file with settings.
+For the script run, it need to specify the file with settings.
 
 ```bash
 ./pg_backup.sh config.example
 ```
 
-The description of config can be found in 
-[config](files/config).
+The description of config can be found in [config](files/config).
 
 Paths:
 

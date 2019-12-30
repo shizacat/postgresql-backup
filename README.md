@@ -7,13 +7,13 @@ Feature:
 
 - Backup of postgresql role
 - Backup only selected databases
-- The list of exclude databases
+- List of exclude databases
 - Logs
-- The metrics for Prometheus
+- Prometheus metrics
 
 ### Run
 
-For the script run, it need to specify the file with settings.
+Specify a settings file to run the script.
 
 ```bash
 ./pg_backup.sh config.example
@@ -24,8 +24,8 @@ The description of config can be found in [config](files/config).
 Paths:
 
 - /opt/pg_backup/bin - script
-- /opt/pg_backup/conf - folder with config
-- /var/log/pg_backup - folder with logs
+- /opt/pg_backup/conf - config folder
+- /var/log/pg_backup - logs folder
 
 
 ### Testing
@@ -36,7 +36,7 @@ cd tests
 vagrant up
 ```
 
-During development, so that apply the changes.
+To apply ansible changes
 
 ```bash
 vagrant provision

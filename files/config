@@ -8,7 +8,7 @@ DB_URL=postgresql://user:pass@host:5432/db_name
 # Exclude list database, split ","
 EXCLUDE="template1, template0"
 
-# If exists then will be use only this databases. Split ","
+# If exists then will be used current database. Split ","
 ONLY_INCLUDE=""
 
 # Will not be create backup the roles

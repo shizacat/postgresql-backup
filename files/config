@@ -1,5 +1,11 @@
+# Directory, where will be stored backup
+# If not selected, backup not will be to rotation
+DIR_TO_BACKUP=/backup/store
 # Directory, where will be create the backup
-DIR_TO_BACKUP=/backup
+DIR_WORK=/backup/work
+
+# How many store the lasts backups
+ROTATION_COUNT_BACKUP=1
 
 # URL for access to database
 # postgresql:///<dbname>  # access by unix socket

@@ -7,6 +7,7 @@ Feature:
 
 - Backup of postgresql role
 - Backup only selected databases
+- Rotation of backup
 - List of exclude databases
 - Logs
 - Prometheus metrics

@@ -64,6 +64,8 @@ source ${CONFIG_PATH}
 
 # Setup
 TIME_START=$(date +%s)
+NEW_BACKUP_DIR=$(date +%Y-%m-%d_%H:%M)
+ROTATION_COUNT_BACKUP=${ROTATION_COUNT_BACKUP:-1}
 
 if ! [ -z "${LOG_DISABLE}" ]; then
     LOG_PATH=/dev/null
@@ -73,9 +75,20 @@ fi
 
 log_start_backup
 
-if ! [ -d ${DIR_TO_BACKUP} ]; then
-    echo "Directory for backup not exists"
+if ! [ -d ${DIR_WORK} ]; then
+    msg="Directory for work not exists"
+    echo $(log_format "${msg}") >> ${LOG_PATH}
+    echo "${msg}"
     exit 1
+fi
+
+if ! [ -z ${DIR_TO_BACKUP} ]; then
+    if ! [ -d ${DIR_TO_BACKUP} ]; then
+        msg="Directory for backup store not exists"
+        echo $(log_format "${msg}") >> ${LOG_PATH}
+        echo "${msg}"
+        exit 1
+    fi
 fi
 
 PG_CONFIG_STRING=""
@@ -83,7 +96,9 @@ PG_CONFIG_STRING=""
 if ! [ -z "${DB_URL}" ]; then
     PG_CONFIG_STRING="--dbname=${DB_URL}"
 else
-    echo "Need setup the DB_URL for access to host"
+    msg="Need setup the DB_URL for access to host"
+    echo $(log_format "${msg}") >> ${LOG_PATH}
+    echo "${msg}"
     exit 1
 fi
 
@@ -105,24 +120,46 @@ STATE_ERROR=0
 db_list=$(psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${query}" 2>>${LOG_PATH})
 STATE_ERROR=`expr $STATE_ERROR + $?`
 
-## Clear backup dir
-rm -rf ${DIR_TO_BACKUP}/*
+## Clear work directory
+rm -rf ${DIR_WORK}/*
 
 for db_name in $db_list
 do
-    pg_dump -Fd -j 10 -f ${DIR_TO_BACKUP}/$db_name ${PG_CONFIG_STRING} 2>>${LOG_PATH}
+    pg_dump -Fd -j 10 -f ${DIR_WORK}/$db_name ${PG_CONFIG_STRING} 2>>${LOG_PATH}
     STATE_ERROR=`expr $STATE_ERROR + $?`
 done
 
 ## Roles
 if [ -z "${IS_NOT_ROLES}" ]; then
-    pg_dumpall -r ${PG_CONFIG_STRING} 2>>${LOG_PATH} | gzip - > ${DIR_TO_BACKUP}/roles.sql.gz
+    pg_dumpall -r ${PG_CONFIG_STRING} 2>>${LOG_PATH} | gzip - > ${DIR_WORK}/roles.sql.gz
     STATE_ERROR=`expr $STATE_ERROR + $?`
 fi
 
 # Logs
 TIME_DURATION=`expr $(date +%s) - ${TIME_START}`
-SIZE_BACKUP=`du -sb ${DIR_TO_BACKUP} | cut -f1`
+SIZE_BACKUP=`du -sb ${DIR_WORK} | cut -f1`
+
+# Rotation
+if ! [ -z ${DIR_TO_BACKUP} ]; then
+    if [ ${STATE_ERROR} -eq "0" ]; then
+        # Move
+        mkdir ${DIR_TO_BACKUP}/${NEW_BACKUP_DIR}
+        mv ${DIR_WORK}/* ${DIR_TO_BACKUP}/${NEW_BACKUP_DIR}
+
+        # Rotate
+        count=0
+        for i in $(ls -rd ${DIR_TO_BACKUP}/*); do
+            if [ "${count}" -ge "${ROTATION_COUNT_BACKUP}" ]; then
+                rm -rf ${i}
+            fi
+            count=$(($count + 1))
+        done
+    else
+        msg="The rotation not make, got the error during backup"
+        echo $(log_format "${msg}") >> ${LOG_PATH}
+        echo ${msg}
+    fi
+fi
 
 log_stop_backup
 

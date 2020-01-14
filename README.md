@@ -50,7 +50,8 @@ Example Playbook
       vars:
         pg_backup_config_file: config.test
         pg_backup_config: |
-          DIR_TO_BACKUP=/backup
+          DIR_TO_BACKUP=/backup/store
+          DIR_WORK=/backup/work
           DB_URL=postgresql:///postgres
           EXCLUDE="template1"
           ONLY_INCLUDE=""

@@ -32,3 +32,9 @@ IS_NOT_ROLES=""
 PROM_PUSHGATEWAY_URL=""
 # Add custom the label, format: /label/value
 PROM_PUSHGATEWAY_LABELS=""
+
+# SQL setting
+# If they are specified, then the SQL code will be executed
+# before/after the process.
+# SQL_BEFORE_SNIPPET=""
+# SQL_AFTER_SNIPPET=""

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Backup postgresql
-# Version: 1.0
+# Version: 1.1
 
 function quote_string_by_element {
     result=""
@@ -117,6 +117,12 @@ fi
 ## The status code for all backup operation
 STATE_ERROR=0
 
+## SQL befor
+if ! [ -z "${SQL_BEFORE_SNIPPET}" ]; then
+    psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${SQL_BEFORE_SNIPPET}" 2>>${LOG_PATH}
+    STATE_ERROR=`expr $STATE_ERROR + $?`
+fi
+
 db_list=$(psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${query}" 2>>${LOG_PATH})
 STATE_ERROR=`expr $STATE_ERROR + $?`
 
@@ -132,6 +138,12 @@ done
 ## Roles
 if [ -z "${IS_NOT_ROLES}" ]; then
     pg_dumpall -r ${PG_CONFIG_STRING} 2>>${LOG_PATH} | gzip - > ${DIR_WORK}/roles.sql.gz
+    STATE_ERROR=`expr $STATE_ERROR + $?`
+fi
+
+## SQL after
+if ! [ -z "${SQL_AFTER_SNIPPET}" ]; then
+    psql --no-align --quiet --tuples-only ${PG_CONFIG_STRING} -c "${SQL_AFTER_SNIPPET}" 2>>${LOG_PATH}
     STATE_ERROR=`expr $STATE_ERROR + $?`
 fi
 

@@ -11,6 +11,7 @@ Feature:
 - List of exclude databases
 - Logs
 - Prometheus metrics
+- The SQL code executed before/after the process of backup
 
 ### Run
 

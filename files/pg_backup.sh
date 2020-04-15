@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Backup postgresql
-# Version: 1.1
+# Version: 1.2
 
 function quote_string_by_element {
     result=""
@@ -95,6 +95,7 @@ PG_CONFIG_STRING=""
 
 if ! [ -z "${DB_URL}" ]; then
     PG_CONFIG_STRING="--dbname=${DB_URL}"
+    PG_CONFIG_STRING_WITHOUT_DB="--dbname=$(sed 's/\(.*\)\/.*$/\1/g' <<< $DB_URL)"
 else
     msg="Need setup the DB_URL for access to host"
     echo $(log_format "${msg}") >> ${LOG_PATH}
@@ -131,7 +132,7 @@ rm -rf ${DIR_WORK}/*
 
 for db_name in $db_list
 do
-    pg_dump -Fd -j 10 -f ${DIR_WORK}/$db_name ${PG_CONFIG_STRING} 2>>${LOG_PATH}
+    pg_dump -Fd -j 10 -f ${DIR_WORK}/$db_name ${PG_CONFIG_STRING_WITHOUT_DB}/${db_name} 2>>${LOG_PATH}
     STATE_ERROR=`expr $STATE_ERROR + $?`
 done
 

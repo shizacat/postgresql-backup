@@ -49,6 +49,7 @@ vagrant provision
 ---------------
 
     - hosts: servers
+      become: yes
       vars:
         pg_backup_config_file: config.test
         pg_backup_config: |
